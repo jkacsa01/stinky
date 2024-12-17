@@ -1,0 +1,197 @@
+/* A L L    P A G E */
+* {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.mid {
+    max-width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+}
+
+/* M A I N   P A G E */
+.gameChoice {
+    text-align: center;
+    background: grey;
+    width: 300px;
+    padding: 9px 0 9px 0;
+    color: white;
+}
+.news {
+    background: grey;
+    width: 400px;
+    padding: 9px 0 9px 0;
+    color: white;
+}
+.new {
+    margin: 2px 15px 2px 15px;
+}
+
+/* R U L E S*/
+.title {
+    color: white;
+    font-weight: bolder;
+    text-decoration: underline;
+    text-transform: capitalize;
+}
+.main_title {
+    color: white;
+    padding-bottom: 3px;
+    border-bottom: 3px solid white;
+    margin-top: 40px;
+}
+.ruleArea {
+    background: rgb(17,6,205);
+    background: linear-gradient(90deg, rgba(17,6,205,1) 0%, rgba(0,108,255,1) 50%, rgba(17,6,205,1) 100%);
+}
+.details {
+    color: white;
+    margin-top: 0px;
+    margin-left: 10px;
+}
+strong {
+    color: rgb(255, 208, 0);
+}
+.tipp {
+    margin-top: 10px;
+    margin-left: 10px;
+    color: rgb(57, 199, 255);
+    text-shadow: 2px 2px 8px rgb(0, 0, 0);
+    border: 1px solid white;
+    padding: 5px;
+}
+.list {
+    color: rgb(29, 231, 2);
+    margin: 10px 0 10px 0;
+    margin-left: 15px;
+}
+figcaption {
+    text-align: center;
+    border-radius: 25px;
+    padding: 2px;
+    font-weight: bold;
+    color: rgb(251, 255, 0);
+    background: rgb(192, 192, 192);
+}
+figure {
+    background: grey;
+    padding: 15px 0 0 0;
+    border-radius: 25px;
+}
+.dutchPl {
+    background: grey;
+    padding: 15px 0 0 0;
+    border-radius: 25px;
+    width: 200px;
+    height: 205px;
+}
+.dutchDesc {
+    text-align: center;
+    border-radius: 25px;
+    padding: 2px;
+    font-weight: bold;
+    color: rgb(251, 255, 0);
+    background: rgb(192, 192, 192);
+}
+
+/* S T I N K Y */
+.numIndicator {
+    background: rgb(18, 77, 13);
+    color: white;
+    text-align: center;
+    border: 2px solid black;
+    border-radius: 20px;
+    height: 15px;
+    width: 30px;
+}
+.addPlayer {
+    border: none;
+    margin-top: 40px;
+    padding: 10px;
+    width: 100px;
+    color: white;
+    background: rgb(0, 0, 173);
+    border-radius: 25px 0 25px 0;
+    cursor: pointer;
+}
+.addPlayer:active {
+    background: rgb(0, 0, 121);
+    padding: 15px;
+    transition: all 0.1s;
+}
+
+/* B O T H   G A M E*/
+.gameArea {
+    background: rgb(29,0,0);
+    background: linear-gradient(90deg, rgba(29,0,0,1) 0%, rgba(159,0,0,1) 50%, rgba(29,0,0,1) 100%);
+}
+.gameTitle {
+    color: white;
+    background: rgb(184, 0, 0);
+    width: 150px; text-align: center;
+}
+.kHely {
+    background: rgb(18, 77, 13);
+    border: 2px solid black;
+    border-radius: 5px;
+    width: 150px;
+    height: 200px;
+}
+.kInfo {
+    background: rgb(18, 77, 13);
+    border: 2px solid black;
+    border-radius: 10px;
+    width: 150px;
+    height: 20px;
+}
+.texts {
+    color: white;
+    font-weight: bold;
+    margin: 0;
+    text-align: center;
+    font-size: small;
+}
+.table {
+    padding: 20px;
+    background: rgb(6, 100, 6);
+    border: 15px solid rgb(87, 47, 15);
+    border-radius: 10%;
+}
+.ruleEntry {
+    background: rgb(0, 126, 230);
+    padding: 15px;
+    border-radius: 30px 45px 45px 0;
+    color: rgb(248, 248, 248);
+}
+.ruleEntry:active {
+    background: rgb(0, 91, 165);
+    padding: 20px;
+    transition: all 0.1s;
+}
+.myTurn {
+    background: rgb(187, 112, 0);
+    transition: all 0.5s ease-in-out;
+}
+
+/* D U T C H */
+.dutch {
+    width: 130px;
+    height: 40px;
+    background: rgb(122, 0, 0);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: medium;
+}
+.dutch:active {
+    background: rgb(85, 0, 0);
+    margin-top: 5px;
+    text-transform: uppercase;
+}

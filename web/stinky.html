@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stinky</title>
+</head>
+<body class="gameArea">
+    <div class="mid">
+        <h1 class="gameTitle">Stinky</h1>
+    </div>
+    <table class="mid table">
+        <tr><td></td><td></td><td class="kInfo" id="ellenfel"><p class="texts">Ellenfél paklija</p></td><td></td></tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td class="kHely"><p></p></td>
+            <td style="position: absolute; top: 259px;"><p class="numIndicator texts" id="ellenszam"></p></td>
+        </tr>
+        <tr><td id="Iplayer3"><p id="Tplayer3"></p></td><td class="kInfo"><p class="texts">Ellenfél talonja</p></td><td class="kInfo"><p class="texts">Középső pakli</p></td><td class="kInfo"><p class="texts">Saját talonod</p></td><td id="Iplayer4"><p id="Tplayer4"></p></td></tr>
+        <tr>
+            <td id="player3"><p></p></td>
+            <td class="kHely"><p></p></td>
+            <td class="kHely texts" id="pakli" onclick="ut()" style="font-size: 48pt"><p></p></td>
+            <td class="kHely"><p></p></td>
+            <td id="player4"><p></p></td>
+        </tr>
+        <tr><td></td><td></td><td class="kInfo" id="mi"><p class="texts">Saját paklid</p></td><td></td></tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td class="kHely" onclick="igen()"><p></p></td>
+            <td style="position: absolute; top: 730px;"><p class="numIndicator texts" id="miszam"></p></td>
+        </tr>
+    </table>
+    <div class="mid"><button class="addPlayer" name="asd" onclick="connectPlayer()">+1 játékos</button></div>
+    <div class="mid" style="margin-top: 50px;"><a class="ruleEntry" href="rules.html">Hogyan kell játszani?</a></div>
+    <script src="game.js"></script>
+	<script src="webhook.js"></script>
+</body>
+</html>
