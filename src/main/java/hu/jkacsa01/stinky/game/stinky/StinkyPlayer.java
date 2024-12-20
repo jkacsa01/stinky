@@ -1,12 +1,13 @@
-package hu.jkacsa01.stinky.game;
+package hu.jkacsa01.stinky.game.stinky;
 
 import hu.jkacsa01.stinky.card.impl.french.FrenchCard;
+import hu.jkacsa01.stinky.game.Player;
+import hu.jkacsa01.stinky.network.NetworkUtil;
 import jakarta.websocket.Session;
 
 import java.util.ArrayDeque;
-import java.util.Collection;
 
-public class StinkyPlayer implements Player<FrenchCard> {
+public class StinkyPlayer implements Player {
 
     private final Session session;
     private final String name;
@@ -17,6 +18,7 @@ public class StinkyPlayer implements Player<FrenchCard> {
         this.session = session;
         this.name = name;
         this.game = game;
+        NetworkUtil.setPlayer(session, this);
     }
 
     @Override
@@ -30,12 +32,12 @@ public class StinkyPlayer implements Player<FrenchCard> {
     }
 
     @Override
-    public Collection<FrenchCard> getCards() {
+    public ArrayDeque<FrenchCard> getCards() {
         return cards;
     }
 
     @Override
-    public Game<? extends Player<FrenchCard>> getGame() {
+    public StinkyGame getGame() {
         return game;
     }
 }

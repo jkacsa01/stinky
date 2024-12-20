@@ -5,7 +5,7 @@ import hu.jkacsa01.stinky.card.CardCollection;
 
 import java.util.*;
 
-public class FrenchCardCollection implements CardCollection<FrenchCard> {
+public class FrenchCardCollection implements CardCollection {
 
     public static final FrenchCardCollection INSTANCE = new FrenchCardCollection();
     public final Set<FrenchCard> ALL_CARDS;
@@ -26,7 +26,7 @@ public class FrenchCardCollection implements CardCollection<FrenchCard> {
     }
 
     @Override
-    public Collection<FrenchCard> getAllCards() {
+    public Collection getAllCards() {
         return ALL_CARDS;
     }
 }

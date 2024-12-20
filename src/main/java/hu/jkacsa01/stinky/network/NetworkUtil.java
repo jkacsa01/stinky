@@ -4,27 +4,43 @@ import hu.jkacsa01.stinky.card.Card;
 import hu.jkacsa01.stinky.card.CardValue;
 import hu.jkacsa01.stinky.game.Game;
 import hu.jkacsa01.stinky.game.Player;
-import hu.jkacsa01.stinky.game.StinkyGame;
-import hu.jkacsa01.stinky.game.StinkyPlayer;
-import hu.jkacsa01.stinky.network.packet.Packet;
-import jakarta.websocket.CloseReason;
-import jakarta.websocket.EncodeException;
-import jakarta.websocket.Session;
+import hu.jkacsa01.stinky.network.packet.ClientboundPacket;
+import hu.jkacsa01.stinky.network.packet.PacketHandler;
+import hu.jkacsa01.stinky.network.packet.ServerboundPacket;
+import hu.jkacsa01.stinky.network.packet.impl.server.DisconnectS2CPacket;
+import jakarta.websocket.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-
-import static hu.jkacsa01.stinky.network.ClientConnectionHandler.PLAYERS;
 
 public class NetworkUtil {
 
+    private static final String PLAYER_KEY = "player";
+
     public static String readString(ByteBuffer buffer) {
-        byte[] bytes = new byte[buffer.get()];
-        buffer.get(bytes);
-        return new String(bytes, StandardCharsets.UTF_8);
+        byte[] array = new byte[buffer.get()];
+        buffer.get(array);
+        return new String(array, StandardCharsets.UTF_8);
+    }
+
+    public static <T extends ServerboundPacket> void registerPacket(Session session, PacketHandler<T> handler) {
+        session.addMessageHandler(handler.packet(), handler);
+    }
+
+    public static void unregisterAllPacket(Session session) {
+        for (MessageHandler messageHandler : session.getMessageHandlers()) {
+            if (messageHandler instanceof PacketHandler<?>) session.removeMessageHandler(messageHandler);
+        }
+    }
+
+    public static <T extends ServerboundPacket> void unregisterPacket(Session session, Class<T> packet) {
+        for (MessageHandler messageHandler : session.getMessageHandlers()) {
+            if (messageHandler instanceof PacketHandler<?> packetHandler && packetHandler.packet() == packet) {
+                session.removeMessageHandler(messageHandler);
+            }
+        }
     }
 
     public static void writeString(ByteArrayOutputStream buffer, String string) {
@@ -33,35 +49,50 @@ public class NetworkUtil {
         buffer.writeBytes(bytes);
     }
 
-    public static <T extends CardValue> void writeCard(ByteArrayOutputStream buffer, Card<T> card) {
+    public static void writeCard(ByteArrayOutputStream buffer, Card card) {
         writeString(buffer, card.getType().getSymbol());
         writeString(buffer, card.getValue().getName());
     }
 
-    public static void sendPacket(Session session, Packet packet) {
+    public static void sendPacket(Session session, ClientboundPacket packet) {
         try {
-            if (!session.isOpen()) disconnect(session);
+            if (!session.isOpen()) {
+                disconnect(session);
+                return;
+            }
             session.getBasicRemote().sendObject(packet);
         } catch (IOException | EncodeException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static void disconnect(Session session) {
+    public static void setPlayer(Session session, Player player) {
+        session.getUserProperties().put(PLAYER_KEY, player);
+    }
+
+    public static Player getPlayer(Session session) {
+        return (Player) session.getUserProperties().get(PLAYER_KEY);
+    }
+
+    public static void disconnect(Session session, String reason) {
         try {
-            if (session.isOpen()) session.close(new CloseReason(CloseReason.CloseCodes.PROTOCOL_ERROR, "Szerver kick."));
-            StinkyPlayer player = PLAYERS.remove(session.getId());
-            if (player != null) {
-                ((StinkyGame) player.getGame()).removePlayer(player);
-                PLAYERS.clear();
+            Player player = getPlayer(session);
+            if (player != null) player.getGame().removePlayer(player);
+            if (session.isOpen()) {
+                NetworkUtil.sendPacket(session, new DisconnectS2CPacket(reason));
+                session.close(new CloseReason(CloseReason.CloseCodes.PROTOCOL_ERROR, reason));
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void sendPacketAll(Game<?> game, Packet packet) {
-        for (Player<?> p : game.getAllPlayers()) {
+    public static void disconnect(Session session) {
+        disconnect(session, "Szerver kick.");
+    }
+
+    public static void sendPacketAll(Game game, ClientboundPacket packet) {
+        for (Player p : game.getPlayers()) {
             sendPacket(p.getSession(), packet);
         }
     }

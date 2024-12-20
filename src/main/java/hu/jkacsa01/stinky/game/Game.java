@@ -1,16 +1,18 @@
 package hu.jkacsa01.stinky.game;
 
-import java.util.List;
+import hu.jkacsa01.stinky.network.packet.PacketListener;
 
-public interface Game<T extends Player<?>> {
+import java.util.Collection;
+
+public interface Game {
 
     int getId();
 
     int getMaxPlayers();
 
-    List<T> getAllPlayers();
+    Collection<? extends Player> getPlayers();
 
-    T getPlayerOnTurn();
+    Player getPlayerOnTurn();
 
     void nextPlayer();
 
@@ -18,7 +20,7 @@ public interface Game<T extends Player<?>> {
 
     void startGame();
 
-    boolean joinPlayer(T player);
+    PacketListener getPacketListener();
 
-    void removePlayer(T player);
+    void removePlayer(Player player);
 }

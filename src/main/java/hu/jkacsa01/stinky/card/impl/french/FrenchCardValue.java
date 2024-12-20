@@ -1,7 +1,5 @@
 package hu.jkacsa01.stinky.card.impl.french;
 
-import hu.jkacsa01.stinky.card.Card;
-import hu.jkacsa01.stinky.card.CardCollection;
 import hu.jkacsa01.stinky.card.CardValue;
 
 public enum FrenchCardValue implements CardValue {

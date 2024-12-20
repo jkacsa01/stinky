@@ -3,7 +3,7 @@ package hu.jkacsa01.stinky.card.impl.french;
 import hu.jkacsa01.stinky.card.Card;
 import hu.jkacsa01.stinky.card.CardType;
 
-public class FrenchCard implements Card<FrenchCardValue> {
+public class FrenchCard implements Card {
 
     private final FrenchCardType type;
     private final FrenchCardValue value;
@@ -24,7 +24,7 @@ public class FrenchCard implements Card<FrenchCardValue> {
     }
 
     @Override
-    public CardType<FrenchCardValue> getType() {
+    public CardType getType() {
         return type;
     }
 }

@@ -1,23 +1,26 @@
-package hu.jkacsa01.stinky.game;
+package hu.jkacsa01.stinky.game.stinky;
 
+import hu.jkacsa01.stinky.card.CardUtil;
 import hu.jkacsa01.stinky.card.impl.NullCard;
 import hu.jkacsa01.stinky.card.impl.french.FrenchCard;
 import hu.jkacsa01.stinky.card.impl.french.FrenchCardValue;
-import hu.jkacsa01.stinky.network.ClientConnectionHandler;
+import hu.jkacsa01.stinky.game.Game;
+import hu.jkacsa01.stinky.game.Player;
 import hu.jkacsa01.stinky.network.NetworkUtil;
+import hu.jkacsa01.stinky.network.packet.PacketListener;
 import hu.jkacsa01.stinky.network.packet.impl.server.ActivePlayerS2CPacket;
 import hu.jkacsa01.stinky.network.packet.impl.server.PlayerDataUpdateS2CPacket;
 import hu.jkacsa01.stinky.network.packet.impl.server.SlotUpdateS2CPacket;
 
 import java.util.ArrayDeque;
-import java.util.List;
 import java.util.Objects;
 
-public class StinkyGame implements Game<StinkyPlayer> {
+public class StinkyGame implements Game {
 
     // [A] B C D    A turn  ->  [B] C D A    B turn
     private final ArrayDeque<StinkyPlayer> playerQueue = new ArrayDeque<>();
     private ArrayDeque<FrenchCard> stack = new ArrayDeque<>();
+    private final StinkyPacketListener packetListener = new StinkyPacketListener(this);
     private FrenchCard currentCard;
     private FrenchCard lastCard;
     private FrenchCard lastLastCard;
@@ -34,12 +37,12 @@ public class StinkyGame implements Game<StinkyPlayer> {
     }
 
     @Override
-    public List<StinkyPlayer> getAllPlayers() {
-        return playerQueue.stream().toList();
+    public ArrayDeque<StinkyPlayer> getPlayers() {
+        return playerQueue;
     }
 
     @Override
-    public StinkyPlayer getPlayerOnTurn() {
+    public Player getPlayerOnTurn() {
         return playerQueue.getFirst();
     }
 
@@ -47,7 +50,7 @@ public class StinkyGame implements Game<StinkyPlayer> {
     public void nextPlayer() {
         NetworkUtil.sendPacketAll(this, new PlayerDataUpdateS2CPacket(getPlayerOnTurn()));
         playerQueue.addLast(playerQueue.remove());
-        for (StinkyPlayer player : playerQueue) {
+        for (Player player : playerQueue) {
             if (!player.getCards().isEmpty()) continue;
             endGame();
             break;
@@ -58,7 +61,7 @@ public class StinkyGame implements Game<StinkyPlayer> {
     private void prevPlayer() {
         NetworkUtil.sendPacketAll(this, new PlayerDataUpdateS2CPacket(getPlayerOnTurn()));
         playerQueue.addFirst(playerQueue.removeLast());
-        for (StinkyPlayer player : playerQueue) {
+        for (Player player : playerQueue) {
             if (!player.getCards().isEmpty()) continue;
             endGame();
             break;
@@ -80,35 +83,14 @@ public class StinkyGame implements Game<StinkyPlayer> {
             playerQueue.addLast(playerQueue.remove());
         }
         NetworkUtil.sendPacketAll(this, new ActivePlayerS2CPacket(getPlayerOnTurn()));
-        for (StinkyPlayer stinkyPlayer : playerQueue) {
+        for (Player stinkyPlayer : playerQueue) {
             NetworkUtil.sendPacketAll(this, new PlayerDataUpdateS2CPacket(stinkyPlayer));
         }
     }
 
     @Override
-    public boolean joinPlayer(StinkyPlayer player) {
-        if (getAllPlayers().size() >= getMaxPlayers() && getMaxPlayers() != 0) return false;
-
-        ClientConnectionHandler.PLAYERS.put(player.getSession().getId(), player);
-
-        System.out.println("Uj jatekos!!!: "+player.getName());
-
-        playerQueue.addLast(player);
-        playerQueue.forEach((p) -> System.out.println(p.getName()));
-        if (getAllPlayers().size() == getMaxPlayers()) startGame();
-
-        for (StinkyPlayer stinkyPlayer : playerQueue) {
-            NetworkUtil.sendPacket(player.getSession(), new PlayerDataUpdateS2CPacket(stinkyPlayer));
-        }
-
-        return true;
-    }
-
-    @Override
-    public void removePlayer(StinkyPlayer player) {
-        playerQueue.removeFirstOccurrence(player);
-        reinitStack();
-
+    public PacketListener getPacketListener() {
+        return packetListener;
     }
 
     private static int getPenalityByValue(FrenchCardValue value) {
@@ -121,7 +103,7 @@ public class StinkyGame implements Game<StinkyPlayer> {
         };
     }
 
-    private void reinitStack() {
+    public void reinitStack() {
         stack = new ArrayDeque<>();
         penality = 0;
         lastCard = null;
@@ -158,8 +140,13 @@ public class StinkyGame implements Game<StinkyPlayer> {
 
     public void placeCard(StinkyPlayer player) {
         if (!Objects.equals(getPlayerOnTurn().getSession().getId(), player.getSession().getId())) return;
-        FrenchCard card = ((ArrayDeque<FrenchCard>) player.getCards()).removeFirst();
+        FrenchCard card = player.getCards().removeFirst();
         placeCard(card);
+    }
+
+    public void removePlayer(Player player) {
+        getPlayers().removeFirstOccurrence(player);
+        reinitStack();
     }
 
     private boolean hitIsValid() {
@@ -175,4 +162,5 @@ public class StinkyGame implements Game<StinkyPlayer> {
                 prevPlayer();
         }
     }
+    
 }

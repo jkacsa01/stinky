@@ -4,7 +4,7 @@ import hu.jkacsa01.stinky.card.CardType;
 
 import java.util.Set;
 
-public enum FrenchCardType implements CardType<FrenchCardValue> {
+public enum FrenchCardType implements CardType {
     CLUBS("Treff", "♣"),
     DIAMONDS("Káró", "♦"),
     SPADES("Pikk","♠"),

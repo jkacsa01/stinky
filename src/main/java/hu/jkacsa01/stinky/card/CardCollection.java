@@ -4,9 +4,9 @@ import java.util.Collection;
 import java.util.Set;
 
 // For example: hungarian, french, uno etc...
-public interface CardCollection<V extends Card<? extends CardValue>> {
+public interface CardCollection {
 
     String getName();
 
-    Collection<V> getAllCards();
+    Collection<Card> getAllCards();
 }

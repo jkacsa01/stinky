@@ -1,4 +1,4 @@
-package hu.jkacsa01.stinky.game;
+package hu.jkacsa01.stinky.card;
 
 import hu.jkacsa01.stinky.card.impl.french.FrenchCard;
 import hu.jkacsa01.stinky.card.impl.french.FrenchCardCollection;

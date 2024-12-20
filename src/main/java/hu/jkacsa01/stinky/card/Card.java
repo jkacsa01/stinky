@@ -2,11 +2,11 @@ package hu.jkacsa01.stinky.card;
 
 import java.io.Serializable;
 
-public interface Card<V extends CardValue> {
+public interface Card {
 
     String getName();
 
-    V getValue();
+    CardValue getValue();
 
-    CardType<V> getType();
+    CardType getType();
 }

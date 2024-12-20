@@ -6,7 +6,7 @@ import hu.jkacsa01.stinky.card.CardValue;
 
 import java.util.Set;
 
-public class NullCard implements Card<NullCard.NullCardValue> {
+public class NullCard implements Card {
     @Override
     public String getName() {
         return "";
@@ -18,7 +18,7 @@ public class NullCard implements Card<NullCard.NullCardValue> {
     }
 
     @Override
-    public CardType<NullCardValue> getType() {
+    public CardType getType() {
         return new NullCardType();
     }
 
@@ -34,7 +34,7 @@ public class NullCard implements Card<NullCard.NullCardValue> {
         }
     }
 
-    public static class NullCardType implements CardType<NullCardValue> {
+    public static class NullCardType implements CardType {
         @Override
         public String getName() {
             return "";

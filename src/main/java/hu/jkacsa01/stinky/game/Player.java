@@ -5,13 +5,13 @@ import jakarta.websocket.Session;
 
 import java.util.Collection;
 
-public interface Player<T extends Card<?>> {
+public interface Player {
 
     Session getSession();
 
     String getName();
 
-    Collection<T> getCards();
+    Collection<? extends Card> getCards();
 
-    Game<? extends Player<T>> getGame();
+    Game getGame();
 }
