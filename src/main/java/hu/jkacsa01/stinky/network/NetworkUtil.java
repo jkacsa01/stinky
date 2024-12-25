@@ -1,14 +1,16 @@
 package hu.jkacsa01.stinky.network;
 
 import hu.jkacsa01.stinky.card.Card;
-import hu.jkacsa01.stinky.card.CardValue;
 import hu.jkacsa01.stinky.game.Game;
 import hu.jkacsa01.stinky.game.Player;
 import hu.jkacsa01.stinky.network.packet.ClientboundPacket;
 import hu.jkacsa01.stinky.network.packet.PacketHandler;
 import hu.jkacsa01.stinky.network.packet.ServerboundPacket;
 import hu.jkacsa01.stinky.network.packet.impl.server.DisconnectS2CPacket;
-import jakarta.websocket.*;
+import jakarta.websocket.CloseReason;
+import jakarta.websocket.EncodeException;
+import jakarta.websocket.MessageHandler;
+import jakarta.websocket.Session;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -50,8 +52,7 @@ public class NetworkUtil {
     }
 
     public static void writeCard(ByteArrayOutputStream buffer, Card card) {
-        writeString(buffer, card.getType().getSymbol());
-        writeString(buffer, card.getValue().getName());
+        writeString(buffer, card.getName());
     }
 
     public static void sendPacket(Session session, ClientboundPacket packet) {

@@ -1,7 +1,9 @@
 package hu.jkacsa01.stinky.game.stinky;
 
 import hu.jkacsa01.stinky.card.CardUtil;
+import hu.jkacsa01.stinky.card.impl.LoseCard;
 import hu.jkacsa01.stinky.card.impl.NullCard;
+import hu.jkacsa01.stinky.card.impl.WinCard;
 import hu.jkacsa01.stinky.card.impl.french.FrenchCard;
 import hu.jkacsa01.stinky.card.impl.french.FrenchCardValue;
 import hu.jkacsa01.stinky.game.Game;
@@ -19,9 +21,9 @@ public class StinkyGame implements Game {
 
     // [A] B C D    A turn  ->  [B] C D A    B turn
     private final ArrayDeque<StinkyPlayer> playerQueue = new ArrayDeque<>();
+    private ArrayDeque<FrenchCard> punishStack = new ArrayDeque<>();
     private ArrayDeque<FrenchCard> stack = new ArrayDeque<>();
     private final StinkyPacketListener packetListener = new StinkyPacketListener(this);
-    private FrenchCard currentCard;
     private FrenchCard lastCard;
     private FrenchCard lastLastCard;
     private int penality;
@@ -50,28 +52,33 @@ public class StinkyGame implements Game {
     public void nextPlayer() {
         NetworkUtil.sendPacketAll(this, new PlayerDataUpdateS2CPacket(getPlayerOnTurn()));
         playerQueue.addLast(playerQueue.remove());
-        for (Player player : playerQueue) {
-            if (!player.getCards().isEmpty()) continue;
-            endGame();
-            break;
-        }
         NetworkUtil.sendPacketAll(this, new ActivePlayerS2CPacket(getPlayerOnTurn()));
+        endGame();
     }
 
     private void prevPlayer() {
         NetworkUtil.sendPacketAll(this, new PlayerDataUpdateS2CPacket(getPlayerOnTurn()));
         playerQueue.addFirst(playerQueue.removeLast());
-        for (Player player : playerQueue) {
-            if (!player.getCards().isEmpty()) continue;
-            endGame();
-            break;
-        }
         NetworkUtil.sendPacketAll(this, new ActivePlayerS2CPacket(getPlayerOnTurn()));
+        endGame();
     }
 
     @Override
     public void endGame() {
+        boolean firstEmpty = playerQueue.getFirst().getCards().isEmpty();
+        boolean lastEmpty = playerQueue.getLast().getCards().isEmpty();
+        Player player;
+        if (firstEmpty) player = playerQueue.getLast();
+        else if (lastEmpty) player = playerQueue.getFirst();
+        else return;
         reinitStack();
+        for (Player p : playerQueue) {
+            if (Objects.equals(p.getSession().getId(), player.getSession().getId()))
+                NetworkUtil.sendPacket(p.getSession(), new SlotUpdateS2CPacket(0, new WinCard()));
+            else
+                NetworkUtil.sendPacket(p.getSession(), new SlotUpdateS2CPacket(0, new LoseCard()));
+            NetworkUtil.disconnect(p.getSession(), "A nyertes: "+player.getName()+"\nFrissitsd az oldalt uj jatekhoz!");
+        }
         System.out.println("Vége!");
     }
 
@@ -105,14 +112,15 @@ public class StinkyGame implements Game {
 
     public void reinitStack() {
         stack = new ArrayDeque<>();
+        punishStack = new ArrayDeque<>();
         penality = 0;
         lastCard = null;
         lastLastCard = null;
-        currentCard = null;
     }
 
     private void moveStackTo(StinkyPlayer player) {
         player.getCards().addAll(stack);
+        player.getCards().addAll(punishStack);
         reinitStack();
         System.out.println("MOVE STACK");
         NetworkUtil.sendPacketAll(this, new SlotUpdateS2CPacket(0, new NullCard()));
@@ -121,12 +129,11 @@ public class StinkyGame implements Game {
 
     private void placeCard(FrenchCard card) {
         lastLastCard = lastCard;
-        lastCard = currentCard;
-        currentCard = card;
-        stack.addFirst(currentCard);
+        lastCard = stack.isEmpty() ? null : stack.getFirst();
+        stack.addFirst(card);
         System.out.println(card.getName());
-        NetworkUtil.sendPacketAll(this, new SlotUpdateS2CPacket(0, currentCard));
-        int pen = getPenalityByValue(currentCard.getValue());
+        NetworkUtil.sendPacketAll(this, new SlotUpdateS2CPacket(0, card));
+        int pen = getPenalityByValue(card.getValue());
         if (pen > 0) penality = pen;
         else if (penality > 0) {
             if (--penality == 0) {
@@ -140,6 +147,10 @@ public class StinkyGame implements Game {
 
     public void placeCard(StinkyPlayer player) {
         if (!Objects.equals(getPlayerOnTurn().getSession().getId(), player.getSession().getId())) return;
+        if (player.getCards().isEmpty()) {
+            nextPlayer();
+            return;
+        }
         FrenchCard card = player.getCards().removeFirst();
         placeCard(card);
     }
@@ -150,9 +161,7 @@ public class StinkyGame implements Game {
     }
 
     private boolean hitIsValid() {
-        return lastCard != null &&
-                currentCard != null &&
-                (currentCard.getValue() == lastCard.getValue() || (lastLastCard != null && currentCard.getValue() == lastLastCard.getValue()));
+        return lastCard != null && (stack.getFirst().getValue() == lastCard.getValue() || (lastLastCard != null && stack.getFirst().getValue() == lastLastCard.getValue()));
     }
 
     public void hitStack(StinkyPlayer player) {
@@ -160,7 +169,11 @@ public class StinkyGame implements Game {
             moveStackTo(player);
             if (!Objects.equals(getPlayerOnTurn().getSession().getId(), player.getSession().getId()))
                 prevPlayer();
+        } else {
+            if (player.getCards().isEmpty()) return;
+            punishStack.addFirst(player.getCards().remove());
+            NetworkUtil.sendPacketAll(this, new PlayerDataUpdateS2CPacket(player));
         }
     }
-    
+
 }

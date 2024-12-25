@@ -62,6 +62,8 @@ socket.addEventListener('message', function (event) {
 			(yes !== name ? mi : ellenfel).classList = "kInfo";
 		} else if (id === 2) {
 			(readString(data) !== name ? ellenszam : miszam).innerText = readByte(data);
+		} else if (id === 3) {
+			alert(readString(data));
 		}
 		console.log(pointer);
 		pointer = 0;
